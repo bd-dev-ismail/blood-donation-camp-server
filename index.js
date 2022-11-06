@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 //midlewares 
@@ -22,6 +22,7 @@ const client = new MongoClient(uri, {
 async function run(){
     try{
         const donationCollection = client.db('bloodDonation').collection('donation');
+        const eventsCollection = client.db('bloodDonation').collection('events')
         //create
         app.post("/donation", async (req, res) => {
           const doc = req.body;
@@ -29,6 +30,20 @@ async function run(){
           const donation = await donationCollection.insertOne(doc);
           res.send(donation);
         });
+        //read
+        app.get("/donation", async(req,res)=> {
+          const query = {};
+          const cursor = donationCollection.find(query);
+          const donation = await cursor.toArray();
+          res.send(donation);
+        });
+        //find one by id
+        app.get('/donation/:id', async(req, res)=> {
+          const id = req.params.id;
+          const query = {_id: ObjectId(id)};
+          const result = await donationCollection.findOne(query);
+          res.send(result);
+        })
     }
     finally{
 
