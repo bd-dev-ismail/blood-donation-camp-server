@@ -43,6 +43,29 @@ async function run(){
           const query = {_id: ObjectId(id)};
           const result = await donationCollection.findOne(query);
           res.send(result);
+        });
+        //event api
+        app.post('/events', async(req, res)=> {
+          const event = req.body;
+          const result = await eventsCollection.insertOne(event);
+          res.send(result);
+        });
+        //email query !
+        app.get('/events', async(req, res)=> {
+          let query = {};
+          if(req.query.email){
+            query = {email: req.query.email}
+          }
+          const cursor = eventsCollection.find(query);
+          const result = await cursor.toArray();
+          res.send(result);
+        });
+        //delete event
+        app.delete('/events/:id', async(req, res)=> {
+          const id = req.params.id;
+          const query = {_id: ObjectId(id)};
+          const result = await eventsCollection.deleteOne(query);
+          res.send(result);
         })
     }
     finally{
